@@ -1,6 +1,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <vector>
+#include <iomanip>
 
 #include "rv_disasm.hpp"
 
@@ -11,6 +12,13 @@ void Disassembler::disassembler(const vector<uint32_t> instruction)
     for(int i=0; i < int(instruction.size()); i++ )
     {
         uint8_t opcode = get_opcode(instruction[i]);
+        if(opcode_instr_type.find(opcode)==opcode_instr_type.end()){
+            cout << "Illegal instruction Opcode: 0x"
+                 << setfill('0') << setw(8)
+                 << hex << instruction[i] << endl;
+            continue;
+        }
+
         instr_typedef type = opcode_instr_type.at(opcode);
         // parse instructions to the respective handler type
         switch (type)
@@ -44,7 +52,7 @@ void Disassembler::disassembler(const vector<uint32_t> instruction)
 //            break;
 
         default:
-            cout << "\nIllegal Instruction";
+            cout << "Illegal Instruction\n";
         }
     }
 }
@@ -70,7 +78,6 @@ void Disassembler::R_type_handler(const uint32_t instruction)
     cout << gp_regs_name_table[rd].second   << ", ";
     cout << gp_regs_name_table[rs1].second  << ", ";
     cout << gp_regs_name_table[rs2].second  << endl;
-
 }
 
 void Disassembler::I_gp_type_handler(const uint32_t instruction)
@@ -95,6 +102,5 @@ void Disassembler::I_gp_type_handler(const uint32_t instruction)
     cout << gp_regs_name_table[rd].second   << ", ";
     cout << gp_regs_name_table[rs1].second  << ", 0x";
     cout << hex << int(imm) << endl;
-
 }
 
