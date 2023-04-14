@@ -13,9 +13,7 @@ void Disassembler::disassembler(const vector<uint32_t> instruction)
     {
         uint8_t opcode = get_opcode(instruction[i]);
         if(opcode_instr_type.find(opcode)==opcode_instr_type.end()){
-            cout << "Illegal instruction Opcode: 0x"
-                 << setfill('0') << setw(8)
-                 << hex << instruction[i] << endl;
+            illegal_op(instruction[i]);
             continue;
         }
 
@@ -30,29 +28,30 @@ void Disassembler::disassembler(const vector<uint32_t> instruction)
         case(instr_typedef::I_gp):
             I_gp_type_handler (instruction[i]);
             break;
-//
-//        case(instr_typedef::I_ld):
-//            I_ld_type_handler (instruction[i]);
-//            break;
-//
-//        case(instr_typedef::S):
-//            S_type_handler (instruction[i]);
-//            break;
-//
-//        case(instr_typedef::J):
-//            J_type_handler (instruction[i]);
-//            break;
-//
-//        case(instr_typedef::I_jalr):
-//            I_jalr_type_handler (instruction[i]);
-//            break;
+
+        case(instr_typedef::I_ld):
+            I_ld_type_handler (instruction[i]);
+            break;
+
+        case(instr_typedef::S):
+            S_type_handler (instruction[i]);
+            break;
+
+        case(instr_typedef::J):
+            J_type_handler (instruction[i]);
+            break;
+
+        case(instr_typedef::I_jalr):
+            I_jalr_type_handler (instruction[i]);
+            break;
 //
 //        case(instr_typedef::U):
 //            U_type_handler (instruction[i]);
 //            break;
 
         default:
-            cout << "Illegal Instruction\n";
+            //cout << "Illegal Instruction\n";
+            illegal_op(instruction[i]);
         }
     }
 }
@@ -60,6 +59,13 @@ void Disassembler::disassembler(const vector<uint32_t> instruction)
 uint8_t Disassembler::get_opcode(const uint32_t instruction)
 {
     return instruction & 0x0000007F;
+}
+
+void Disassembler::illegal_op(const uint32_t instruction)
+{
+    cout << "Illegal instruction : 0x"
+         << setfill('0') << setw(8)
+         << hex << instruction << endl;
 }
 
 void Disassembler::R_type_handler(const uint32_t instruction)
@@ -74,15 +80,16 @@ void Disassembler::R_type_handler(const uint32_t instruction)
     rs1 = (instruction>>15) & reg_mask;
     rs2 = (instruction>>20) & reg_mask;
 
-    cout << R_type_table.at(mnemonic)     << "\t";
-    cout << gp_regs_name_table[rd].second   << ", ";
-    cout << gp_regs_name_table[rs1].second  << ", ";
-    cout << gp_regs_name_table[rs2].second  << endl;
+    cout << R_type_table.at(mnemonic)       << "\t"
+         << gp_regs_name_table[rd].second   << ","
+         << gp_regs_name_table[rs1].second  << ","
+         << gp_regs_name_table[rs2].second  << endl;
 }
 
 void Disassembler::I_gp_type_handler(const uint32_t instruction)
 {
-    uint8_t mnemonic, rd, rs1, imm;
+    uint8_t mnemonic, rd, rs1;
+    uint16_t imm;
     mnemonic =  ((instruction >> 12) & func3_mask);
     rd  = (instruction>> 7) & reg_mask;
     rs1 = (instruction>>15) & reg_mask;
@@ -98,9 +105,74 @@ void Disassembler::I_gp_type_handler(const uint32_t instruction)
         imm = (instruction>>20) & 0xFFF;
     }
 
-    cout << I_gp_type_table.at(mnemonic)    << "\t";
-    cout << gp_regs_name_table[rd].second   << ", ";
-    cout << gp_regs_name_table[rs1].second  << ", 0x";
-    cout << hex << int(imm) << endl;
+    cout << I_gp_type_table.at(mnemonic)    << "\t"
+         << gp_regs_name_table[rd].second   << ","
+         << gp_regs_name_table[rs1].second  << ","
+         << dec << imm << endl;
+}
+
+void Disassembler::I_ld_type_handler(const uint32_t instruction)
+{
+    uint8_t mnemonic, rd, rs1;
+    uint16_t imm;
+    mnemonic = (instruction >> 12) & func3_mask;
+    rd  = (instruction>> 7) & reg_mask;
+    rs1 = (instruction>>15) & reg_mask;
+    imm = (instruction>>20) & 0xFFF;
+
+    cout << I_ld_type_table.at(mnemonic)    << "\t"
+         << gp_regs_name_table[rd].second   << ","
+         << dec << imm << "("
+         << gp_regs_name_table[rs1].second  << ")"
+         << endl;
+}
+
+void Disassembler::S_type_handler(const uint32_t instruction)
+{
+    uint8_t mnemonic, rs1, rs2;
+    uint16_t imm;
+    mnemonic = (instruction >> 12) & func3_mask;
+    rs1 = (instruction>>15) & reg_mask;
+    rs2 = (instruction>>20) & reg_mask;
+    imm = (instruction>> 7) & 0x1F;
+    imm|= ((instruction>>25) & 0x7F)<<5;
+
+    cout << S_type_table.at(mnemonic)       << "\t"
+         << gp_regs_name_table[rs2].second  << ","
+         << dec << imm << "("
+         << gp_regs_name_table[rs1].second  << ")"
+         << endl;
+}
+
+void Disassembler::J_type_handler(const uint32_t instruction)
+{
+    uint8_t rd;
+    int imm;
+
+    rd   = (instruction>> 7) & reg_mask;
+    imm  = (instruction>>21) & 0x3FF;
+    imm |= ((instruction>>20) & 0x1)<<10;
+    imm |= ((instruction>>12) & 0xFF)<<11;
+    imm |= ((instruction>>31) & 0x1)<<20;
+    imm = imm<<1;
+
+    cout << "jal\t" << gp_regs_name_table[rd].second << ", PC + 0x"
+         << hex << int(imm) << endl;
+}
+
+void Disassembler::I_jalr_type_handler(const uint32_t instruction)
+{
+    uint8_t rd, rs1;
+    uint16_t imm;
+
+    rd   = (instruction>> 7) & reg_mask;
+    rs1  = (instruction>>15) & reg_mask;
+    imm = (instruction>>20) & 0xFFF;
+
+    cout << "jalr\t" << gp_regs_name_table[rd].second << ","
+         << dec << imm << "("
+         << gp_regs_name_table[rs1].second << ")"
+         << endl;
+
 }
 

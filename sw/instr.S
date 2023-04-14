@@ -1,6 +1,7 @@
 
 .globl _start
 _start:
+	// R-type
 	add t2, t3, x1
 	sub a0, a1, a2
 	xor t4, s0, s1
@@ -14,7 +15,7 @@ _start:
 	nop
 	nop
 	nop
-	
+	// I-type
 	addi t2, t3, 12
 	xori t4, s0, 11
 	ori a3, a4, 13
@@ -24,5 +25,62 @@ _start:
 	srai x6,x7,17
 	slt x9, x10, 18
 	sltu x26,x27, 19
+	nop
+	nop
+	nop
+	// I (Load) type
+	lb x22, 12(x21)
+	lh x21, 16(x20)
+	lw x20, 20(x19)
+	lbu x19, 24(x18)
+	lhu x18, 28(x17)
+	nop
+	nop
+	nop
+	//  S type
+	sb x17, 32(x16)
+	sh x16, 36(x15)
+	sw x15, 40(x14)
+	nop
+	nop
+	nop
+	// jal
+	jal x2, jmp1
+	jal x3, jmp2
+	jal x4, jmp3
+	nop
+	nop
+	nop
+	// jalr
+	jalr a0, 48(t1)
+	jalr a1, 52(t2)
+	jalr a2, 56(t3)
+
+
+.align 5
+jjr1:
+	ret
+
+.align 5
+jjr2:
+	ret
+
+.align 5
+jjr3:
+	ret
+	
+.align 12
+
+jmp1:
+	nop
+	
+.align 12
+
+jmp2: 
+	nop
+
+.align 12
+jmp3:
+	nop
 	
 	

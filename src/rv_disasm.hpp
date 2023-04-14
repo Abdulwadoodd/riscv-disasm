@@ -14,7 +14,7 @@ using namespace std;
     {
         uint8_t get_opcode      (const uint32_t instruction);
         //uint8_t get_type        (const uint32_t instruction);
-        void parse_instruction  (const uint32_t instruction);
+        void illegal_op         (const uint32_t instruction);
         void R_type_handler     (const uint32_t instruction);
         void I_gp_type_handler  (const uint32_t instruction);
         void I_ld_type_handler  (const uint32_t instruction);
