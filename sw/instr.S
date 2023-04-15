@@ -55,7 +55,42 @@ _start:
 	jalr a0, 48(t1)
 	jalr a1, 52(t2)
 	jalr a2, 56(t3)
+	nop
+	nop
+	nop
+	// branch
+	beq x20, x21, brnch1
+	bne x22, x23, brnch2
+	blt x24, x25, brnch3
+	bge x26, x27, brnch4
+	bltu x28, x29, brnch5
+	bgeu x30, x31, brnch6
 
+
+
+.align 4
+brnch1:
+	ret
+
+.align 4
+brnch2:
+	ret
+	
+.align 4
+brnch3:
+	ret
+	
+.align 4
+brnch4:
+	ret
+	
+.align 4
+brnch5:
+	ret
+
+.align 4
+brnch6:
+	ret
 
 .align 5
 jjr1:

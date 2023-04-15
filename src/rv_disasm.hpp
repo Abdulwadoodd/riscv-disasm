@@ -13,12 +13,12 @@ using namespace std;
     class Disassembler
     {
         uint8_t get_opcode      (const uint32_t instruction);
-        //uint8_t get_type        (const uint32_t instruction);
         void illegal_op         (const uint32_t instruction);
         void R_type_handler     (const uint32_t instruction);
         void I_gp_type_handler  (const uint32_t instruction);
         void I_ld_type_handler  (const uint32_t instruction);
         void S_type_handler     (const uint32_t instruction);
+        void B_type_handler     (const uint32_t instruction);
         void J_type_handler     (const uint32_t instruction);
         void I_jalr_type_handler(const uint32_t instruction);
         void U_type_handler     (const uint32_t instruction);
@@ -157,14 +157,3 @@ using namespace std;
         {0x6, "bltu"},
         {0x7, "bgeu"}
     };
-
-    const unordered_map <uint8_t, string> I_jalr_type_table
-    {
-     // {func3 , "mnemonic"}
-        {0x0, "jalr"}
-    };
-
-
-
-
-

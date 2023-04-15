@@ -41,6 +41,10 @@ void Disassembler::disassembler(const vector<uint32_t> instruction)
             J_type_handler (instruction[i]);
             break;
 
+        case(instr_typedef::B):
+            B_type_handler(instruction[i]);
+            break;
+
         case(instr_typedef::I_jalr):
             I_jalr_type_handler (instruction[i]);
             break;
@@ -131,6 +135,7 @@ void Disassembler::S_type_handler(const uint32_t instruction)
 {
     uint8_t mnemonic, rs1, rs2;
     uint16_t imm;
+
     mnemonic = (instruction >> 12) & func3_mask;
     rs1 = (instruction>>15) & reg_mask;
     rs2 = (instruction>>20) & reg_mask;
@@ -142,6 +147,26 @@ void Disassembler::S_type_handler(const uint32_t instruction)
          << dec << imm << "("
          << gp_regs_name_table[rs1].second  << ")"
          << endl;
+}
+
+void Disassembler::B_type_handler(const uint32_t instruction)
+{
+    uint8_t mnemonic, rs1, rs2;
+    uint16_t imm;
+
+    mnemonic = (instruction >> 12) & func3_mask;
+    rs1  = (instruction>>15) & reg_mask;
+    rs2  = (instruction>>20) & reg_mask;
+    imm  = (instruction>>8) & 0xF;
+    imm |= ((instruction>>25) & 0x3F)<<4;
+    imm |= ((instruction>>7) & 0x1)<<10;
+    imm |= ((instruction>>31) & 0x1)<<11;
+    imm  = imm<<1;
+
+    cout << B_type_table.at(mnemonic)       << "\t"
+         << gp_regs_name_table[rs1].second  << ","
+         << gp_regs_name_table[rs2].second  << ", PC + 0x"
+         << hex << int(imm) << endl;
 }
 
 void Disassembler::J_type_handler(const uint32_t instruction)
@@ -175,4 +200,3 @@ void Disassembler::I_jalr_type_handler(const uint32_t instruction)
          << endl;
 
 }
-
